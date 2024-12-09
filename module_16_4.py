@@ -16,32 +16,32 @@ async def get_all_messages() -> List[User]:             #список объек
     return users                                        #возвращаем нашу базу данных
 
 @app.post("/user/{username}/{age}")
-async def create_message(message: User) -> str:
+async def create_message(message: User) -> User:
     if len(users) == 0:
         message.id = len(users) + 1
     else:
         message.id = users[-1].id+1
     users.append(message)
-    return f"User {message} is registered"
+    return message
 
 @app.put("/user/{user_id}/{username}/{age}")
-async def update_message(user_id: int, username: str, age: int) -> str:
+async def update_message(user_id: int, username: str, age: int) -> User:
     try:
         for user_ in users:
             if user_.id == user_id:
                 user_.username = username
                 user_.age = age
-                return f"User {user_} has been updated"
+                return user_
     except IndexError:
         raise HTTPException(status_code=404, detail="User was not found")
 
 @app.delete("/user/{user_id}")
-async def delete_message(user_id: int) -> str:
+async def delete_message(user_id: int) -> User:
     try:
         for user_ in users:
             if user_.id == user_id:
                 message = users[user_id-1]
                 del users[user_id-1]
-                return f"User {message} has been deleted"                          #если такое сообщение не нашлось,
+                return message                          #если такое сообщение не нашлось,
     except IndexError:                                                     #то срабатывает исключение
         raise HTTPException(status_code=404, detail="User was not found")
